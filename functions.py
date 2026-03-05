@@ -13,8 +13,9 @@ from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 import re
 import plotly.express as px
-from google import genai
-from streamlit_searchbox import st_searchbox
+
+
+
 
 # %%
 
@@ -101,6 +102,7 @@ def get_lo_la(city:str,iso_country):
 
 
 # %%
+@st.cache_data
 def get_weather(lat:int,lo:int) -> int:
     ##This function returns long and latitude of city type on input
     load_dotenv()
@@ -141,21 +143,21 @@ def get_weather(lat:int,lo:int) -> int:
 @st.cache_data
 def carregar_dados_locais():
     # O Pandas já abre o arquivo direto, não precisa do 'with open'
-    return pd.read_csv('worldcities.csv')
+    return pd.read_json('city.list.json')
 
 # %%
 
 def sugestion_cities(query:str,df:pd.DataFrame)-> pd.DataFrame:
     ##Function to sugestion a city to user.
-    ## Need pandas to work
+    ##Need pandas to work
 
     if not query or not query.strip():
         return pd.DataFrame()
     
     if query:
     # 1. Filtramos o DataFrame completo
-        mask = df['city'].str.contains(query, case=False, na=False)
-        df_filtrado = df[mask].head(5) # Pegamos os 5 primeiros resultados completos
+        mask = df['name'].str.contains(query, case=False, na=False)
+        df_filtrado = df[mask].head(20) # Pegamos os 5 primeiros resultados completos
         return df_filtrado
     
 
@@ -164,12 +166,12 @@ def buttons_cities_sugestion () -> None:
         if not st.session_state['df_filtrado'].empty:
 
             # Criando o grid de blocos (5 colunas)
-            cols = st.columns(5)
+            cols = st.columns(20)
         else:
             st.empty()
 
         for i, (index, row) in enumerate(st.session_state['df_filtrado'].iterrows()):
-            cidade = row['city']
+            cidade = row['name']
             pais = row['country']
             
             with cols[i %5]:
@@ -345,11 +347,11 @@ def get_current_infos(dados:dict) -> dict:
 
     try:
         
-        cur_temp = round(dados['current'].get('temp'))
-        cur_feels = round(dados['current'].get('feels_like'))
+        cur_temp = int(dados['current'].get('temp'))
+        cur_feels = int(dados['current'].get('feels_like'))
         cur_press = dados['current'].get('pressure')
         cur_humidity = (dados['current'].get('humidity'))
-        cur_wind = round(dados['current'].get('wind_speed'))
+        cur_wind = int(dados['current'].get('wind_speed'))
         cur_vis = dados['current'].get('visibility')
 
         dici = {'temp':cur_temp,
@@ -413,6 +415,8 @@ def get_daily(dados_clima: dict) -> pd.DataFrame:
 
 # %%
 def get_country_iso(df, country_name='Brazil', iso_type="iso3"):
+
+    
     """
     Busca o código ISO com base no nome do país.
     
@@ -429,3 +433,35 @@ def get_country_iso(df, country_name='Brazil', iso_type="iso3"):
         return result.iloc[0][iso_type]
     
     return None
+
+
+# %%
+
+def get_icons_4_daily(dados_clima: dict) -> list:
+    """
+    Busca um forecast de 20 dias para frente
+    """
+    # Acessa a lista 'daily'
+    lista_diaria = dados_clima.get('daily', [])
+    
+    icones = []
+    # Itera sobre os dias, limitando a 20 (ou o tamanho da lista, o que for menor)
+    for dia in lista_diaria[:20]:
+        # Acessa o primeiro elemento da lista 'weather' e pega o 'icon'
+        icone = dia['weather'][0]['icon']
+        icones.append(get_icon(icone))  # Converte o código do ícone para um emoji usando a função get_icon
+        
+    return icones
+# %%
+
+
+def get_max_min_daily(dados:dict) -> int|int:
+    """" Function to return max and min 
+        of current day """
+    try:
+        daily_max = int(dados['daily'][0]['temp']['max'])
+        daily_min = int(dados['daily'][0]['temp']['min'])
+    except:
+        logging.info('Error in get_max_min_daily')
+
+    return daily_min,daily_max

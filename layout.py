@@ -164,7 +164,6 @@ def site_style()-> None:
         line-height: 1;
         margin-bottom: 10px;
         margin-top: -20px;
-        /* Essa sombra dá o efeito 3D flutuante no emoji */
         filter: drop-shadow(0px 15px 20px rgba(0,0,0,0.4)); 
     }      
         

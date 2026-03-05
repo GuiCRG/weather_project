@@ -1,77 +1,17 @@
 # %%
-import plotly.express as px
 from functions import *
 import pandas as pd
-from google import genai
+import streamlit as st
+from functions import get_icons_4_daily
 
 
 # %%
 
-
-lo_la = get_lo_la('Uberaba')
-city_name = lo_la[0]['name']
-country_name = lo_la[0]['country']
-dados = get_weather(lo_la[0]['lat'],lo_la[0]['lon'])
-
-
-# %% 
-teste = conversor_hour_date(dados['hourly'][4]['dt'],dados['timezone'])
-teste
-
-
-# %%
-
-if 'hourly' in dados and dados['hourly']:
-
-    lista_clima_unix= []
-
-
-    for ponto in dados['hourly'][:6]:
-        
-        hour = conversor_hour_date(ponto.get('dt'),dados['timezone'])
-        temp = ponto.get('temp')
-        caldo = [hour[0],hour[1],temp]
-
-        
-        
-        lista_clima_unix.append(caldo)
-        lista_clima = pd.DataFrame(lista_clima_unix)
-        lista_clima  = lista_clima.rename(columns={0:'data',1:'hour',2:'temp'})
-
-
- 
-
-
-# %%
-
-lista_clima
-
-
-# %%
-
-
-
-
-# %%
-
-lista_clima = pd.DataFrame(lista_clima_unix)
-
-# %%
-
-
-
-fig = px.line(df,x=1,y=2)
-fig.update_layout(yaxis_range=[19.75, 25.27])
-fig.show()
-
-
-# %%
-
-
-teste = llm_gemini('Uberaba,Minas Gerais','20','neve')
-print(teste)
-
-# %%
+#if 'hourly' in dados and dados['hourly']:
+#lo_la = get_lo_la('Uberaba')
+#city_name = lo_la[0]['name']
+#country_name = lo_la[0]['country']
+#dados = get_weather(lo_la[0]['lat'],lo_la[0]['lon'])
 
 teste = {'lat': -19.3509,
  'lon': -48.2429,
@@ -1181,11 +1121,17 @@ teste = {'lat': -19.3509,
    'tags': ['Rain']}]}
 
 
-print(teste)
 # %%
-print(teste['daily'][0]['summary'])
 
-info_curret = get_current_infos(dados)
-print(info_curret)
+print(teste)
+
+
+
+# %%
+
+
+
+icones = get_icons_4_daily(teste)
+print(icones)
 
 # %%
