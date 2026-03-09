@@ -60,12 +60,12 @@ def get_lo_la(city:str):
     """This function returns long and latitude of city type on input"""
     load_dotenv()
 
-    api_geo = st.secrets["API_URL_GEO"]
-    key_geo = st.secrets["OPENWEATHER_API_KEY"]
+    api_geo = st.secrets("API_URL_GEO")
+    key_geo = st.secrets("OPENWEATHER_API_KEY")
 
     api_url = api_geo
     api_key = key_geo
-    
+
     params = {
         "q": {city},
         "appid": api_key
