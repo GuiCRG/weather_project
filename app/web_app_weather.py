@@ -96,6 +96,7 @@ try:
 
     try: ##Conection to api and response
         dados = get_weather(lo_la[0]['lat'],lo_la[0]['lon'])
+        st.write(dados)
         current_info = get_current_infos(dados)
         hour_forecast = get_hourly(dados)
         daily_forecast = get_daily(dados)
