@@ -1,5 +1,6 @@
 # %%
-
+import sys
+from pathlib import Path
 import streamlit as st
 import requests
 from requests.exceptions import HTTPError, Timeout
@@ -13,7 +14,12 @@ from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 import re
 import plotly.express as px
+from ollama import chat
+from ollama import ChatResponse
+import json
 
+
+# %%
 
 
 
@@ -50,14 +56,14 @@ def temp_convertor(temp:str, temperature_convert:str, value:int)-> int:
             return None
 
 # %%
-def get_lo_la(city:str,iso_country):
-    ##This function returns long and latitude of city type on input
+def get_lo_la(city:str):
+    """This function returns long and latitude of city type on input"""
     load_dotenv()
 
     api_url = os.getenv('API_URL_GEO')
     api_key = os.getenv('OPENWEATHER_API_KEY')
     params = {
-        "q": {city,iso_country},
+        "q": {city},
         "appid": api_key
 
     }
@@ -85,26 +91,10 @@ def get_lo_la(city:str,iso_country):
 
 
 
-
-
-
-    
-    # try:
-    #     response = requests.get(api_url,params=params,timeout=5)
-    #     response.raise_for_status()
-    #     data = response.json()
-    #     logging.info(f"Dados recebidos para {city}")
-
-    
-
-    # except Timeout:
-    #     logging.warning(f"Timeout na requisição para {city}")
-
-
 # %%
 @st.cache_data
 def get_weather(lat:int,lo:int) -> int:
-    ##This function returns long and latitude of city type on input
+    """"API Requisition to get weather"""
     load_dotenv()
 
     api_url = os.getenv('API_URL_WEATHER')
@@ -142,31 +132,43 @@ def get_weather(lat:int,lo:int) -> int:
 # %%
 @st.cache_data
 def carregar_dados_locais():
-    # O Pandas já abre o arquivo direto, não precisa do 'with open'
-    return pd.read_json('city.list.json')
+
+    base_dir = Path(__file__).resolve().parents[1]
+    json_path = base_dir / "data" / "city.list.json"
+
+    with open(json_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    df = pd.DataFrame(data)
+    df = df.drop_duplicates(subset=["name"])
+
+    return df
+
+
 
 # %%
 
 def sugestion_cities(query:str,df:pd.DataFrame)-> pd.DataFrame:
-    ##Function to sugestion a city to user.
-    ##Need pandas to work
+    """Function to sugestion a city to user,using the caracter in input"""
 
     if not query or not query.strip():
         return pd.DataFrame()
     
     if query:
-    # 1. Filtramos o DataFrame completo
-        mask = df['name'].str.contains(query, case=False, na=False)
-        df_filtrado = df[mask].head(20) # Pegamos os 5 primeiros resultados completos
+        mask = df['name'].str.startswith(query, na=False)
+        mask = df['name'].str.lower().str.startswith(query.lower(), na=False)
+        df_filtrado = df[mask].head(5) # 5 first results
+        
         return df_filtrado
     
 
 def buttons_cities_sugestion () -> None:
+    """Function to get the city selected to session state"""
     if 'df_filtrado' in st.session_state:
         if not st.session_state['df_filtrado'].empty:
 
-            # Criando o grid de blocos (5 colunas)
-            cols = st.columns(20)
+
+            cols = st.columns(5)
         else:
             st.empty()
 
@@ -175,7 +177,6 @@ def buttons_cities_sugestion () -> None:
             pais = row['country']
             
             with cols[i %5]:
-                # Criando o texto do botão combinando Nome e País
                 label_botao = f"{cidade}, {pais}"
                 
                 if st.button(label_botao, key=f"btn_{index}", use_container_width=True):
@@ -186,21 +187,13 @@ def buttons_cities_sugestion () -> None:
 
     else:
         st.empty()
-        # for i, cidade in enumerate(resultados):
-        #     with cols[i %5]:
-        #         # Adicionamos o índice {i} para garantir que a key seja ÚNICA
-        #         if st.button(cidade, key=f"btn_{cidade}_{i}", use_container_width=True):
-        #             st.session_state["city_selected"] = cidade 
-        #             st.rerun()
 
-
-        # 2. Iteramos pelas linhas do DataFrame filtrado
   
 
 # %%
 
 def get_city() -> list[str]:
-
+    """Get a city and country of session state"""
     if st.session_state['city_country_selected'] != 'Please select a city':
         cidade = st.session_state['city_country_selected']
         try:
@@ -220,7 +213,7 @@ def get_city() -> list[str]:
 # %%
 
 def init_states() -> None:
-    ## Function to iniate states for avoid key erros in refresh page
+    """Function to iniate states for avoid key erros in refresh page"""
     defaults = {
         "sugestions_cities": "",
         "city_country_selected": ""
@@ -234,6 +227,7 @@ def init_states() -> None:
 
 
 def data_hour_tratment(Timestamp:str) -> list:
+    """Function REGEX to tratment timestamp response of API Weather, return date and hour"""
     regex = r'(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})'
     m = re.search(regex, Timestamp)
 
@@ -247,6 +241,7 @@ def data_hour_tratment(Timestamp:str) -> list:
 
 
 def conversor_hour_date(time:int,Zone:str) -> str:
+    """Function to convert date and hour based in timezone and timestamp, use the another function inside this"""
     dt_utc = datetime(1970, 1, 1, tzinfo=timezone.utc) + timedelta(seconds=time)
     dt_sp = str(dt_utc.astimezone(ZoneInfo(Zone)))
     hour_clean = data_hour_tratment(dt_sp)
@@ -257,7 +252,7 @@ def conversor_hour_date(time:int,Zone:str) -> str:
 
 def get_icon(codigo_api):
     """
-    Mapeia os códigos oficiais da OpenWeatherMap para Emojis modernos.
+    Dict to mapping icons code to convert a unicode caracters. 
     """
     icones = {
         "01d": "☀️", # Dia limpo
@@ -290,8 +285,7 @@ def get_icon(codigo_api):
 
 def get_alerts(dados_clima: dict) -> list:
     """
-    Busca os alertas na API e retorna no máximo 2 descrições 
-    em formato de lista de strings.
+    Seek alerts in API response, limit 2.
     """
     lista_descricoes = []
     
@@ -315,7 +309,7 @@ def get_alerts(dados_clima: dict) -> list:
 
 def get_hourly(dados_clima: dict) -> pd.DataFrame:
     """
-    Busca um forecast de 6 horas para frente
+    Return a 6 hours foward for hour forecast
     """
     if 'hourly' in dados_clima and dados_clima['hourly']:
         lista_clima_unix= []
@@ -342,6 +336,8 @@ def get_hourly(dados_clima: dict) -> pd.DataFrame:
 
 
 def get_current_infos(dados:dict) -> dict:
+    """Get current infos of the day, like, temperature,feels like
+    pressure, humidity, wind and visibity"""
 
     dici = dict()
 
@@ -372,28 +368,11 @@ def get_current_infos(dados:dict) -> dict:
         
 
 
-
-# %%
-def llm_gemini(cidade, temp, condicao):
-    
-    client = genai.Client()
-    prompt = (f"""
-            O clima em {cidade} agora é de {temp}°C com {condicao}.
-            Dê uma sugestão de vestuário ou atividade de apenas 1 frase curta e amigável.
-            """)
-    
-
-    response = client.models.generate_content(
-        model="Gemini 2.5 Flash", contents=prompt
-    )
-    return (response.text)
-
-
 # %%
 
 def get_daily(dados_clima: dict) -> pd.DataFrame:
     """
-    Busca um forecast de 20 dias para frente
+    Seek a 20 day forwards to daily forecast
     """
     if 'daily' in dados_clima and dados_clima['daily']:
         lista_clima_unix= []
@@ -414,32 +393,10 @@ def get_daily(dados_clima: dict) -> pd.DataFrame:
 
 
 # %%
-def get_country_iso(df, country_name='Brazil', iso_type="iso3"):
-
-    
-    """
-    Busca o código ISO com base no nome do país.
-    
-    :param df: O DataFrame contendo os dados das cidades.
-    :param country_name: Nome do país (ex: 'France', 'Brazil').
-    :param iso_type: 'iso2' ou 'iso3' (padrão 'iso2').
-    :return: O código ISO encontrado ou None.
-    """
-    # Filtra onde o país bate com o nome (usando case=False para ignorar maiúsculas/minúsculas)
-    result = df[df['country'].str.contains(country_name, case=False, na=False)]
-    
-    if not result.empty:
-        # Pega o primeiro registro encontrado e extrai o ISO correspondente
-        return result.iloc[0][iso_type]
-    
-    return None
-
-
-# %%
 
 def get_icons_4_daily(dados_clima: dict) -> list:
     """
-    Busca um forecast de 20 dias para frente
+    Seek icons for chart daily forecast
     """
     # Acessa a lista 'daily'
     lista_diaria = dados_clima.get('daily', [])
@@ -456,6 +413,7 @@ def get_icons_4_daily(dados_clima: dict) -> list:
 
 
 def get_max_min_daily(dados:dict) -> int|int:
+
     """" Function to return max and min 
         of current day """
     try:
@@ -465,3 +423,25 @@ def get_max_min_daily(dados:dict) -> int|int:
         logging.info('Error in get_max_min_daily')
 
     return daily_min,daily_max
+
+
+
+
+def llm_ollma(city:str,description_weather:str,summary_weather:str,temp)-> str:
+    """Function llm, send a prompt with information weather and retunr suggestion or activieties
+        using model gemma3:1b(ollama) working local"""
+
+    response: ChatResponse = chat(model='gemma3:1b', messages=[
+    {
+        'role': 'user',
+        'content':f"""Answer directly,just the information,not answer like: 'Okay, here’s a concise response:' or similar, concisely, and informatively. 
+                        You have a strict limit of 150 characters. Do not exceed this limit under any circumstances.
+                        Sugeestion of clothes or activities for the city {city}, temperature of {temp}, and weather of {description_weather},
+                        based on this summary: {summary_weather}""",
+    },
+    ])
+
+    resposta = response.message.content
+
+    return resposta
+

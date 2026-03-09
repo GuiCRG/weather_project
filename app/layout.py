@@ -1,12 +1,9 @@
 import streamlit as st
 
-# 1. Configuração da página para ocupar a tela toda
     
 def site_style()-> None:
-    ##Definição do layout/Pagina
+    """Definition of page layout and configs"""
     st.set_page_config(layout="wide")
-
-    # 2. Injeção de CSS para criar a classe "card"
     st.markdown("""
         <style>
         /* Estilo do fundo da página */
@@ -19,66 +16,6 @@ def site_style()-> None:
         .custom-card h1 a, .custom-card h2 a {
             display: none !important;
         }
-
-        /* Estilo do nosso Card personalizado */
-        .custom-card {
-            background-color: #2D2F33;
-            padding: 25px;
-            border-radius: 20px;
-            border: 1px solid #3e4149;
-            color: white;
-            text-align: center !important;
-            transition: transform 0.3s;
-            margin-bottom: 20px !important; 
-            Height: 700px !important;
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: center !important;
-            justify-content: flex-start !important;
-            padding-top: 50px;
-            text-align: center !important;
-            width: 100% !important;
-            margin: 0 auto !important;
-
-        }
-        
-        .custom-card h1, .custom-card h2, .custom-card p {
-            margin: 0 !important;
-            padding: 0 !important;
-            text-align: center !important;
-            width: 100% !important;
-            border: none !important;      
-        }  
-
-        
-        /* Efeito de hover (opcional, fica bem moderno) */
-        .custom-card:hover {
-            transform: translateY(-5px);
-            border-color: #ff4b4b;
-        }
-                
-        /* Estilo do nosso Card personalizado */
-        .custom-card1 {
-            background-color: #000000;
-            padding: 25px;
-            border-radius: 20px;
-            border: 1px solid #3e4149;
-            color: white;
-            text-align: center !important;
-            transition: transform 0.3s;
-            margin-bottom: 20px !important; 
-            Height: 300px !important;
-            display: flex !important;
-            align-self: flex-start !important;
-            flex-direction: column !important;
-            align-items: center !important;
-            justify-content: center !important;
-            text-align: center !important;
-            width: 100% !important;
-            margin: 0 auto !important;
-
-        }
-
 
 
         /* =====================
@@ -163,7 +100,7 @@ def site_style()-> None:
         font-size: 150px; /* Tamanho GIGANTE do ícone */
         line-height: 1;
         margin-bottom: 10px;
-        margin-top: -20px;
+        margin-top: 20px;
         filter: drop-shadow(0px 15px 20px rgba(0,0,0,0.4)); 
     }      
         
@@ -178,7 +115,7 @@ def site_style()-> None:
         align-items: center;
         justify-content: flex-start;
         text-align: center;
-        height: 55vh;    
+        height: 51vh;    
         padding: 30px;
         width: 100% !important;
         
@@ -210,7 +147,7 @@ def site_style()-> None:
             color: white;
 
         }
-    
+
 
         .metrics {
             display: grid;
@@ -276,7 +213,7 @@ def site_style()-> None:
             gap: 20px;
             margin-top: -5px;   
         }
-  
+
                 
                 
         .text-section {
@@ -292,3 +229,5 @@ def site_style()-> None:
         </style>
                 
         """, unsafe_allow_html=True)
+
+    
