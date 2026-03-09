@@ -86,17 +86,18 @@ except Exception as e:
 
 
 lo_la = get_lo_la(city_country[0])
-print('loading step 2')
+#st.write(lo_la)
 
 try:
     city_name = lo_la[0]['name']
     country_name = lo_la[0]['country']
     state_code = lo_la[0]['state']
 
-
     try: ##Conection to api and response
         dados = get_weather(lo_la[0]['lat'],lo_la[0]['lon'])
-        st.write(dados)
+        # st.write(dados)
+
+
         current_info = get_current_infos(dados)
         hour_forecast = get_hourly(dados)
         daily_forecast = get_daily(dados)

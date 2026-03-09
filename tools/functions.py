@@ -59,12 +59,9 @@ def temp_convertor(temp:str, temperature_convert:str, value:int)-> int:
 def get_lo_la(city:str):
     """This function returns long and latitude of city type on input"""
 
-    api_geo = st.secrets["weather_api"]["API_URL_GEO"]
-    key_geo = st.secrets["weather_api"]["OPENWEATHER_API_KEY"]
+    api_url = st.secrets["weather_api"]["API_URL_GEO"]
+    api_key = st.secrets["weather_api"]["OPENWEATHER_API_KEY"]
 
-    api_url = api_geo
-    api_key = key_geo
-    
     params = {
         "q": {city},
         "appid": api_key
@@ -83,12 +80,14 @@ def get_lo_la(city:str):
         data = response.json()
         return data
 
-    except Timeout:
+    except Timeout as e:
+        st.write(e)
         logging.warning('Timeout')
         return None
 
 
     except RequestException as e:
+        st.write(e)
         logging.error(f"Erro na requisição para {city}: {e}")
         return None
 
@@ -96,14 +95,12 @@ def get_lo_la(city:str):
 
 # %%
 @st.cache_data
-def get_weather(lat:int,lo:int) -> int:
+def get_weather(lat:int,lo:int):
     """"API Requisition to get weather"""
 
-    api_geo = st.secrets["weather_api"]["API_URL_GEO"]
-    key_geo = st.secrets["weather_api"]["API_URL_WEATHER"]
-
-    api_url = api_geo
-    api_key = key_geo
+    api_url = st.secrets["weather_api"]["API_URL_WEATHER"]
+    api_key = st.secrets["weather_api"]["OPENWEATHER_API_KEY"]
+    
     params = {
         "lat": lat,
         'lon': lo,
@@ -124,12 +121,14 @@ def get_weather(lat:int,lo:int) -> int:
         data = response.json()
         return data
 
-    except Timeout:
+    except Timeout as e :
+        st.write(e)
         logging.warning('Timeout')
         return None
 
 
     except RequestException as e:
+        st.write(e)
         logging.error(f"Erro na requisição para {lat} e {lo} : {e}")
         return None
 
