@@ -30,6 +30,7 @@ try:  ## first try/expect: error geral, error #000, check
 
     init_states()
     site_style()
+    st.write(st.secrets)
 
 except NameError:
     st.error("Something gonne wrong, don't worry, we working to fix #000 ")
