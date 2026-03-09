@@ -51,7 +51,8 @@ Examples of generated insights include:
 - Generating suggestions based on temperature, humidity, or weather alerts
 
 This allows the application to move beyond raw weather data and provide **natural language insights**.
-
+![LLM1](https://github.com/GuiCRG/weather_project/blob/main/assets/5.1.jpeg)
+![LLM1](https://github.com/GuiCRG/weather_project/blob/main/assets/6.1.jpeg)
 
 <br><br>
 
