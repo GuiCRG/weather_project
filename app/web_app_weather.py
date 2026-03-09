@@ -35,7 +35,7 @@ except NameError:
     st.error("Something gonne wrong, don't worry, we working to fix #000 ")
 
 except Exception as e:
-    # Registra o erro real no console para você debugar, mas mostra algo amigável
+  
     st.error("Something gonne wrong, don't worry, we working to fix #000 ")
     print(f"Error details: {e}")
 
@@ -51,7 +51,7 @@ except NameError:
     st.error("Something gonne wrong, don't worry, we working to fix #001 ")
 
 except Exception as e:
-    # Registra o erro real no console para você debugar, mas mostra algo amigável
+  
     st.error("Something gonne wrong, don't worry, we working to fix #001 ")
     print(f"Error details: {e}")
     # st.write(df_cidades) Debbuging 
@@ -77,7 +77,7 @@ except NameError:
     st.error("Something gonne wrong, don't worry, we working to fix #002 ")
 
 except Exception as e:
-    # Registra o erro real no console para você debugar, mas mostra algo amigável
+  
     st.error("Something gonne wrong, don't worry, we working to fix #002 ")
     print(f"Error details: {e}")
 
@@ -103,7 +103,7 @@ try:
         st.error("Something gonne wrong, don't worry, we working to fix #003 ")
 
     except Exception as e:
-        # Registra o erro real no console para você debugar, mas mostra algo amigável
+      
         st.error("Something gonne wrong, don't worry, we working to fix #003 ")
         print(f"Error details: {e}")
 
@@ -158,8 +158,8 @@ with col2top:
 
 
 try:
-    
-    respose_llm = llm_ollma(city_name,description_weather,summary_weather,current_info["temp"])
+    respose_llm = 'Information LLM available on local only, need examples? acess my github to see LLM working'
+    #respose_llm = llm_ollma(city_name,description_weather,summary_weather,current_info["temp"])
 
 except NameError:
     st.error("Something gonne wrong, don't worry, we working to fix #004 ")
@@ -289,7 +289,7 @@ with col_card_dir:
         st.error("Anything gonne wrong, don't worry, we working to fix #006 ")
 
     except Exception as e:
-        # Registra o erro real no console para você debugar, mas mostra algo amigável
+      
         st.error("Anything gonne wrong, don't worry, we working to fix #006 ")
         print(f"Error details: {e}")
 
@@ -371,7 +371,7 @@ with col_card_dir:
         st.error("Anything gonne wrong, don't worry, we working to fix #007 ")
 
     except Exception as e:
-    # Registra o erro real no console para você debugar, mas mostra algo amigável
+  
         st.error("Anything gonne wrong, don't worry, we working to fix #007 ")
         print(f"Error details: {e}")
 
