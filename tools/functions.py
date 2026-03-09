@@ -60,8 +60,8 @@ def get_lo_la(city:str):
     """This function returns long and latitude of city type on input"""
     load_dotenv()
 
-    api_url = st.secrets('API_URL_GEO')
-    api_key = st.secrets('OPENWEATHER_API_KEY')
+    api_url = st.secrets['API_URL_GEO']
+    api_key = st.secrets['OPENWEATHER_API_KEY']
     params = {
         "q": {city},
         "appid": api_key
@@ -97,8 +97,8 @@ def get_weather(lat:int,lo:int) -> int:
     """"API Requisition to get weather"""
     load_dotenv()
 
-    api_url = st.secrets('API_URL_WEATHER')
-    api_key = st.secrets('OPENWEATHER_API_KEY')
+    api_url = st.secrets['API_URL_WEATHER']
+    api_key = st.secrets['OPENWEATHER_API_KEY']
     params = {
         "lat": lat,
         'lon': lo,
