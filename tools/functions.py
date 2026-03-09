@@ -97,8 +97,8 @@ def get_weather(lat:int,lo:int) -> int:
     """"API Requisition to get weather"""
     load_dotenv()
 
-    api_url = st.secrets["API_URL_WEATHER"]
-    api_key = st.secrets["OPENWEATHER_API_KEY"]
+    api_url = st.secrets["weather_api"]["API_URL_WEATHER"]
+    api_key = st.secrets["weather_api"]["OPENWEATHER_API_KEY"]
     params = {
         "lat": lat,
         'lon': lo,
@@ -431,7 +431,7 @@ def llm_ollma(city:str,description_weather:str,summary_weather:str,temp)-> str:
     """Function llm, send a prompt with information weather and retunr suggestion or activieties
         using model gemma3:1b(ollama) working local"""
 
-    response: ChatResponse = chat(model='gemma3:1b', messages=[
+    response: ChatResponse = chat(st.secrets["weather_api"]["model"], messages=[
     {
         'role': 'user',
         'content':f"""Answer directly,just the information,not answer like: 'Okay, here’s a concise response:' or similar, concisely, and informatively. 
