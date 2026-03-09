@@ -115,7 +115,7 @@ def site_style()-> None:
         align-items: center;
         justify-content: flex-start;
         text-align: center;
-        height: 51vh;    
+        height: 55vh;    
         padding: 30px;
         width: 100% !important;
         
